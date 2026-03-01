@@ -9,21 +9,29 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//-- Rutas de autenticación que proporciona Laravel UI login, register, logout, etc.
+//-- Rutas de autenticación (Laravel UI)
 Auth::routes();
 
-//-- Todos los usuarios autenticados pueden ver listado y detalle
 Route::middleware(['auth'])->group(function () {
 
+    /*
+        HOME
+    */
+
+    Route::get('/home', function () {
+        return redirect()->route('tasks.index');
+    })->name('home');
+
+    /*
+        TASK ROUTES
+    */
+
+    //-- Listado de tareas (todos los roles)
     Route::get('/tasks', [TaskController::class, 'index'])
         ->name('tasks.index')
         ->middleware('role:admin|editor|user');
 
-    Route::get('/tasks/{task}', [TaskController::class, 'show'])
-        ->name('tasks.show')
-        ->middleware('role:admin|editor|user');
-
-    //-- Solo admin y editor pueden crear/editar/borrar
+    //-- Crear tarea (admin y editor)
     Route::middleware(['role:admin|editor'])->group(function () {
 
         Route::get('/tasks/create', [TaskController::class, 'create'])
@@ -42,7 +50,15 @@ Route::middleware(['auth'])->group(function () {
             ->name('tasks.destroy');
     });
 
-    //-- Solo admin puede ver listado de usuarios
+    //-- Ver tarea
+    Route::get('/tasks/{task}', [TaskController::class, 'show'])
+        ->name('tasks.show')
+        ->middleware('role:admin|editor|user');
+
+    /*
+        USER ROUTES (solo admin)
+    */
+
     Route::middleware(['role:admin'])->group(function () {
 
         Route::get('/users', [UserController::class, 'index'])
