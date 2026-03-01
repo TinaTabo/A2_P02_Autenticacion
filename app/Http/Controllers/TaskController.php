@@ -12,7 +12,8 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        $tasks = Task::latest()->paginate(10);
+        return view('tasks.index', compact('tasks'));
     }
 
     /**
@@ -20,7 +21,7 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
+        return view('tasks.create');
     }
 
     /**
@@ -28,7 +29,15 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        Task::create($request->only('title', 'description'));
+
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task created successfully.');
     }
 
     /**
@@ -36,7 +45,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
+        return view('tasks.show', compact('task'));
     }
 
     /**
@@ -44,7 +53,7 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-        //
+        return view('tasks.edit', compact('task'));
     }
 
     /**
@@ -52,7 +61,15 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $task->update($request->only('title', 'description'));
+
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task updated successfully.');
     }
 
     /**
@@ -60,6 +77,9 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        $task->delete();
+
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task deleted successfully.');
     }
 }
