@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -34,7 +39,10 @@ class PostController extends Controller
             'content'=>'required',
         ]);
 
-        Post::create($request->only('title','content'));
+        //-- Creacion post antes de añadir roles con el usuario autenticado
+        //Post::create($request->only('title','content'));
+
+        $request->user()->posts()->create($request->only('title','content'));
 
         return redirect()->route('posts.index')->with('success','Post created successfully');
     }
@@ -44,6 +52,7 @@ class PostController extends Controller
      */
     public function show(string $id)
     {
+        $post = Post::findOrFail($id);
         return view('posts.show',compact('post'));
     }
 
@@ -53,6 +62,7 @@ class PostController extends Controller
     public function edit(string $id)
     {
         $post = Post::findOrFail($id);
+        $this->authorize('update', $post);
         return view('posts.edit',compact('post'));
     }
 
@@ -67,6 +77,7 @@ class PostController extends Controller
         ]);
 
         $post = Post::findOrFail($id);
+        $this->authorize('update', $post);
         $post-> update($request->only('title','content'));
 
         return redirect()->route('posts.index')->with('success','Post updated successfully');
@@ -78,8 +89,9 @@ class PostController extends Controller
     public function destroy(string $id)
     {
         $post = Post::findOrFail($id);
+        $this->authorize('delete', $post);
         $post->delete();
 
-        return redirect()->route('posts.index')->with('success','Post deletec successfully');
+        return redirect()->route('posts.index')->with('success','Post deleted successfully');
     }
 }

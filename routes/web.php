@@ -7,11 +7,21 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//-- Rutas de autenticación que proporciona Laravel UI login, register, logout, etc.
 Auth::routes();
 
-Route::resource('posts', App\Http\Controllers\PostController::class);
-Route::get('/', function(){
+Route::get('/home', function(){
     return redirect()->route('posts.index');
+})->name('home');
+
+Route::middleware('auth')->group(function () {
+    Route::resource('posts', App\Http\Controllers\PostController::class);
 });
+
+
+// Test de CRUD posts
+// Route::get('/', function(){
+//     return redirect()->route('posts.index');
+// });
 
 //Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

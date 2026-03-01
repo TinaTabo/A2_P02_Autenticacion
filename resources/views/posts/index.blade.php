@@ -13,8 +13,11 @@
                 <p class="card-text">{{ Str::limit($post->content, 200) }}</p>
 
                 <a href="{{ route('posts.show', $post) }}" class="btn btn-sm btn-outline-secondary">View</a>
-                <a href="{{ route('posts.edit', $post) }}" class="btn btn-sm btn-warning">Edit</a>
 
+                @can('update', $post)
+                <a href="{{ route('posts.edit', $post) }}" class="btn btn-sm btn-warning">Edit</a>
+                @endcan
+                @can('delete', $post)
                 <form action="{{ route('posts.destroy', $post) }}" method="POST"
                         class="d-inline"
                         onsubmit="return confirm('Delete this post?');">
@@ -22,6 +25,7 @@
                     @method('DELETE')
                     <button class="btn btn-sm btn-danger">Delete</button>
                 </form>
+                @endcan
             </div>
         </div>
     @endforeach
